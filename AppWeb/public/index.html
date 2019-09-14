@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Freelancer - Start Bootstrap Theme</title>
+
+  <!-- Custom fonts for this theme -->
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+  <!-- Theme CSS -->
+  <link href="css/freelancer.min.css" rel="stylesheet">
+
+<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="jquery-1.12.0.min.js"></script>
+	<script type="text/javascript" src="dist/Chart.bundle.min.js"></script>
+	<script type="text/javascript" src="Codigo/code.js"></script>
+	<style>
+		canvas{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+	</style>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		var d = [0];
+		var dd = [0];
+		var datosram = {
+			type: 'line',
+			data: {
+				labels: [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				datasets: [{
+					label: 'Utilizacion',
+					backgroundColor : "rgba(220,220,220,0.5)",
+					borderColor: "rgba(255,45,45,1)",
+					data: d,
+					fill: false,
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Porcentaje de RAM consumida'
+				},
+				scales: {
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 100
+						}
+					}]
+				}
+			}
+		};
+		var datos = {
+			type: 'line',
+			data: {
+				labels: [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				datasets: [{
+					label: 'Utilizacion',
+					backgroundColor : "rgba(220,220,220,0.5)",
+					borderColor: "rgba(255,45,45,1)",
+					data: d,
+					fill: false,
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Porcentaje de uso del CPU'
+				},
+				scales: {
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 100
+						}
+					}]
+				}
+			}
+		};
+
+		var canvasram = document.getElementById('chartram').getContext('2d');
+		window.myLinex = new Chart(canvasram, datosram);
+
+		var canvas = document.getElementById('chart').getContext('2d');
+		window.myLine = new Chart(canvas, datos);
+
+		setInterval(function(){
+			
+			datosram.data.datasets.splice(0);
+			var newDataram = {
+				label: '%',
+				backgroundColor : "rgba(220,220,220,0.5)",
+				borderColor: "rgba(255,45,45,1)",
+				data: dd,
+				fill: false,
+			};
+
+			datosram.data.datasets.push(newDataram);
+
+			datos.data.datasets.splice(0);
+			var newData = {
+				label: '%',
+				backgroundColor : "rgba(220,220,220,0.5)",
+				borderColor: "rgba(255,45,45,1)",
+				data: d,
+				fill: false,
+			};
+
+			datos.data.datasets.push(newData);
+
+			window.myLinex.update();
+			window.myLine.update();
+
+		}, 5000);
+
+var variable = 0;
+		var socket = io.connect('http://localhost:8080');
+            socket.on('graph', function(porcentajeRAM ,porcentajeCPU, ramtotal, ramconsumida, ramconsumidaporcentaje, totaldeprocesos, procesosejecucion,procesosslepping,procesosidle,procesoszombie,listadoprocesos,listadoprocesoshijos){
+			dd = porcentajeRAM;
+			d = porcentajeCPU;
+			document.getElementById("WOW").innerHTML = porcentajeCPU[porcentajeCPU.length-1];
+			document.getElementById("id_ramtotal").innerHTML = ramtotal;
+			document.getElementById("id_ramconsumida").innerHTML = ramconsumida;
+			document.getElementById("id_ramconsumidaporcentaje").innerHTML = ramconsumidaporcentaje;
+			document.getElementById("p1").innerHTML = totaldeprocesos;
+			document.getElementById("p2").innerHTML = procesosejecucion;
+			document.getElementById("p3").innerHTML = procesosslepping;
+			document.getElementById("p4").innerHTML = procesosidle;
+			document.getElementById("p5").innerHTML = procesoszombie;
+			if(variable==0){
+				console.log(listadoprocesos);
+				variable = 1;
+	var table = document.getElementById('tablaprocesos');
+    table.innerHTML = "";   
+      
+	var newRow1 = table.insertRow(table.rows.length);
+		var cel11 = newRow1.insertCell(0);
+      		var cel21 = newRow1.insertCell(1);
+      		var cel31 = newRow1.insertCell(2);
+      		var cel41 = newRow1.insertCell(3);
+      		var cel51 = newRow1.insertCell(4);
+
+		cel11.innerHTML = "PID";
+  	  	cel21.innerHTML = "USUARIO";
+	        cel31.innerHTML = "ESTADO";
+ 	        cel41.innerHTML = "MEMORIA USADA";
+ 	        cel51.innerHTML = "NOMBRE";
+
+	for(var t=0; t<listadoprocesos.length; t++){
+		var auxx = listadoprocesos[t];
+		var newRow = table.insertRow(table.rows.length);
+		var cel1 = newRow.insertCell(0);
+      		var cel2 = newRow.insertCell(1);
+      		var cel3 = newRow.insertCell(2);
+      		var cel4 = newRow.insertCell(3);
+      		var cel5 = newRow.insertCell(4);
+
+		cel1.innerHTML = auxx[0];
+		if(auxx[0]<900){
+	  	  	cel2.innerHTML = "root";
+		}else{
+	  	  	cel2.innerHTML = "sopes2";
+		}
+
+	        cel3.innerHTML = auxx[auxx.length-1];
+ 	        cel4.innerHTML = auxx[auxx.length-2];
+ 	        cel5.innerHTML = auxx[1];
+	}
+	
+			}
+
+        });
+
+
+
+
+	});
+
+function procesoshijos(){
+var variable = 0;
+	var tablexxx = document.getElementById('numeropadre').value;
+	alert("MATANDO PROCESO : "+tablexxx);
+var socket = io.connect('http://localhost:8080');
+            socket.on('graph', function(porcentajeRAM ,porcentajeCPU, ramtotal, ramconsumida, ramconsumidaporcentaje, totaldeprocesos, procesosejecucion,procesosslepping,procesosidle,procesoszombie,listadoprocesos,listadoprocesoshijos){
+			dd = porcentajeRAM;
+			d = porcentajeCPU;
+			document.getElementById("WOW").innerHTML = porcentajeCPU[porcentajeCPU.length-1];
+			document.getElementById("id_ramtotal").innerHTML = ramtotal;
+			document.getElementById("id_ramconsumida").innerHTML = ramconsumida;
+			document.getElementById("id_ramconsumidaporcentaje").innerHTML = ramconsumidaporcentaje;
+			document.getElementById("p1").innerHTML = totaldeprocesos;
+			document.getElementById("p2").innerHTML = procesosejecucion;
+			document.getElementById("p3").innerHTML = procesosslepping;
+			document.getElementById("p4").innerHTML = procesosidle;
+			document.getElementById("p5").innerHTML = procesoszombie;
+			if(variable==0){
+				console.log(listadoprocesos);
+				variable = 1;
+	var table = document.getElementById('tablaprocesos');
+    table.innerHTML = "";   
+      
+	var newRow1 = table.insertRow(table.rows.length);
+		var cel11 = newRow1.insertCell(0);
+      		var cel21 = newRow1.insertCell(1);
+      		var cel31 = newRow1.insertCell(2);
+      		var cel41 = newRow1.insertCell(3);
+      		var cel51 = newRow1.insertCell(4);
+
+		cel11.innerHTML = "PID";
+  	  	cel21.innerHTML = "USUARIO";
+	        cel31.innerHTML = "ESTADO";
+ 	        cel41.innerHTML = "MEMORIA USADA";
+ 	        cel51.innerHTML = "NOMBRE";
+
+	for(var t=0; t<listadoprocesos.length; t++){
+		var auxx = listadoprocesos[t];
+		if(auxx[0]==tablexxx){
+		}else{
+			var newRow = table.insertRow(table.rows.length);
+			var cel1 = newRow.insertCell(0);
+	      		var cel2 = newRow.insertCell(1);
+	      		var cel3 = newRow.insertCell(2);
+	      		var cel4 = newRow.insertCell(3);
+	      		var cel5 = newRow.insertCell(4);
+
+			cel1.innerHTML = auxx[0];
+			if(auxx[0]<900){
+		  	  	cel2.innerHTML = "root";
+			}else{
+		  	  	cel2.innerHTML = "sopes2";
+			}
+
+			cel3.innerHTML = auxx[auxx.length-1];
+	 	        cel4.innerHTML = auxx[auxx.length-2];
+	 	        cel5.innerHTML = auxx[1];
+		}
+		
+	}
+	
+			}
+
+        });
+}
+
+function verhijos(){
+	alert("VAMOS A VER A LOS HIJOS");
+	var socket = io.connect('http://localhost:8080');
+            socket.on('graph', function(porcentajeRAM ,porcentajeCPU, ramtotal, ramconsumida, ramconsumidaporcentaje, totaldeprocesos, procesosejecucion,procesosslepping,procesosidle,procesoszombie,listadoprocesos,listadoprocesoshijos){
+			
+//	console.log(porcentajeRAM);
+
+	var tablex = document.getElementById('tablaprocesoshijos');
+	var val = document.getElementById('numeropadre1').value;
+    tablex.innerHTML = "";   
+      
+	var newRow1 = tablex.insertRow(tablex.rows.length);
+		var cel11 = newRow1.insertCell(0);
+      		var cel21 = newRow1.insertCell(1);
+
+		cel11.innerHTML = "PID";
+ 	        cel21.innerHTML = "NOMBRE";
+
+	for(var t=0; t<listadoprocesoshijos.length; t++){
+		var auxx = listadoprocesoshijos[t];
+		if(auxx[0].includes("H"+val+"A")){
+			var newRow = tablex.insertRow(tablex.rows.length);
+			var cel1 = newRow.insertCell(0);
+	      		var cel2 = newRow.insertCell(1);
+			cel1.innerHTML = auxx[1];
+			cel2.innerHTML = auxx[2];
+		}
+		
+
+	}
+	
+		
+
+        });
+
+}
+	</script>
+</head>
+
+<body id="page-top">
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">Monitores</a>
+      <button class="navbar-toggler navbar-toggler-right text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+	 <li class="nav-item mx-0 mx-lg-1">
+            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#portfolio">CPU</a>
+          </li>
+	  <li class="nav-item mx-0 mx-lg-1">
+            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#about">RAM</a>
+          </li>
+          <li class="nav-item mx-0 mx-lg-1">
+            <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#contact">PROCESOS</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Masthead -->
+  <header class="masthead bg-primary text-white text-center">
+    <div class="container d-flex align-items-center flex-column">
+
+      <!-- Masthead Avatar Image -->
+      <img class="masthead-avatar mb-5" src="img/avataaars.svg" alt="">
+
+      <!-- Masthead Heading -->
+      <h1 class="masthead-heading text-uppercase mb-0">Sistemas Operativos 2</h1>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom divider-light">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+
+      <!-- Masthead Subheading -->
+      <p class="masthead-subheading font-weight-light mb-0">Practica 1</p>
+
+    </div>
+  </header>
+
+  <!-- Portfolio Section -->
+  <section class="page-section portfolio" id="portfolio">
+    <div class="container">
+
+      <!-- Portfolio Section Heading -->
+      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Monitor CPU</h2>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+
+      <!-- Portfolio Grid Items -->
+      <div class="col-lg-15 ml-auto">
+
+		<h3><span id="WOW1" class="yellow">Porcentaje del CPU utilizado:</pan></h3>
+		<h3><span id="WOW" class="yellow">0</pan></h3>
+		<div id="canvas-container" style="width:80%;">
+			<canvas id="chart" width="800" height="350"></canvas>
+		</div>
+      </div>
+      <!-- /.row -->
+
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="page-section bg-primary text-white mb-0" id="about">
+    <div class="container">
+
+      <!-- About Section Heading -->
+      <h2 class="page-section-heading text-center text-uppercase text-white">Monitor Memoria RAM</h2>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom divider-light">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+
+      <!-- About Section Content -->
+
+        <div class="col-lg-15 ml-auto">
+	        <h3><span id="WOW0" class="yellow">Total de memoria RAM (megas):</pan></h3>
+		<h3><span id="id_ramtotal" class="yellow">0</pan></h3>	
+		<h3><span id="WOW00" class="yellow">Total de memoria RAM consumida (megas):</pan></h3>
+		<h3><span id="id_ramconsumida" class="yellow">0</pan></h3>
+		<h3><span id="WOW000" class="yellow">Porcentaje consumido de RAM:</pan></h3>
+		<h3><span id="id_ramconsumidaporcentaje" class="yellow">0</pan></h3>
+		<div id="canvas-container" style="width:80%;">
+			<canvas id="chartram" width="800" height="350"></canvas>
+		</div>	
+        </div>
+
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="page-section" id="contact">
+    <div class="container">
+
+      <!-- Contact Section Heading -->
+      <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">ADMINISTRADOR DE PROCESOS</h2>
+
+      <!-- Icon Divider -->
+      <div class="divider-custom">
+        <div class="divider-custom-line"></div>
+        <div class="divider-custom-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="divider-custom-line"></div>
+      </div>
+
+	<h3><span  class="yellow">Total de Procesos : </pan></h3>
+		<h3><span id="p1" class="yellow">0</pan></h3>
+		<h3><span  class="yellow">Procesos Ejecucion : </pan></h3>
+		<h3><span id="p2" class="yellow">0</pan></h3>			
+		<h3><span  class="yellow">Total de Suspendidos : </pan></h3>
+		<h3><span id="p3" class="yellow">0</pan></h3>
+		<h3><span  class="yellow">Total de Idle : </pan></h3>
+		<h3><span id="p4" class="yellow">0</pan></h3>
+		<h3><span  class="yellow">Total de Detenidos : </pan></h3>
+		<h3><span id="p6" class="yellow">0</pan></h3>
+		<h3><span  class="yellow">Total de Zombie : </pan></h3>
+		<h3><span id="p5" class="yellow">0</pan></h3>
+<h1><span  class="yellow">Tabla de procesos </pan></h1>
+		<table class="table table-bordered" id="tablaprocesos" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th>PID</th>
+                        <th>Usuario</th>
+                        <th>Estado</th>
+                        <th>%RAM</th>
+                        <th>Nombre</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+		<br>
+		<h1><span  class="yellow">Matar Proceso</pan></h1>
+                    <input type="text" id="numeropadre" value="" class="btn btn-primary btn-user btn-block">
+                    <input type="button" value="Matar" class="btn btn-primary btn-user btn-block" onclick="procesoshijos()">
+		<br>
+		<h1><span  class="yellow">Ver Hijos</pan></h1>
+                    <input type="text" id="numeropadre1" value="" class="btn btn-primary btn-user btn-block">
+                    <input type="button" value="Ver Hijos" class="btn btn-primary btn-user btn-block" onclick="verhijos()">
+		<br>
+		<br>
+		<h1><span  class="yellow">TABLA DE HIJOS </pan></h1>
+		<table class="table table-bordered" id="tablaprocesoshijos" width="100%" cellspacing="0">
+                    <thead>
+                      <tr>
+                        <th>PID</th>
+                        <th>Nombre</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+    </div>
+  </section>
+
+
+  <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
+  <div class="scroll-to-top d-lg-none position-fixed ">
+    <a class="js-scroll-trigger d-block text-center text-white rounded" href="#page-top">
+      <i class="fa fa-chevron-up"></i>
+    </a>
+  </div>
+
+  <!-- Portfolio Modals -->
+
+  <!-- Portfolio Modal 1 -->
+  <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Log Cabin</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <img class="img-fluid rounded mb-5" src="img/portfolio/cabin.png" alt="">
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                <button class="btn btn-primary" href="#" data-dismiss="modal">
+                  <i class="fas fa-times fa-fw"></i>
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Modal 2 -->
+  <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-labelledby="portfolioModal2Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Tasty Cake</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <img class="img-fluid rounded mb-5" src="img/portfolio/cake.png" alt="">
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                <button class="btn btn-primary" href="#" data-dismiss="modal">
+                  <i class="fas fa-times fa-fw"></i>
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Modal 3 -->
+  <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-labelledby="portfolioModal3Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Circus Tent</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <img class="img-fluid rounded mb-5" src="img/portfolio/circus.png" alt="">
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                <button class="btn btn-primary" href="#" data-dismiss="modal">
+                  <i class="fas fa-times fa-fw"></i>
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Modal 4 -->
+  <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-labelledby="portfolioModal4Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Controller</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <img class="img-fluid rounded mb-5" src="img/portfolio/game.png" alt="">
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                <button class="btn btn-primary" href="#" data-dismiss="modal">
+                  <i class="fas fa-times fa-fw"></i>
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Modal 5 -->
+  <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog" aria-labelledby="portfolioModal5Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Locked Safe</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <img class="img-fluid rounded mb-5" src="img/portfolio/safe.png" alt="">
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                <button class="btn btn-primary" href="#" data-dismiss="modal">
+                  <i class="fas fa-times fa-fw"></i>
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Modal 6 -->
+  <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog" aria-labelledby="portfolioModal6Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">
+            <i class="fas fa-times"></i>
+          </span>
+        </button>
+        <div class="modal-body text-center">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <!-- Portfolio Modal - Title -->
+                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Submarine</h2>
+                <!-- Icon Divider -->
+                <div class="divider-custom">
+                  <div class="divider-custom-line"></div>
+                  <div class="divider-custom-icon">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="divider-custom-line"></div>
+                </div>
+                <!-- Portfolio Modal - Image -->
+                <img class="img-fluid rounded mb-5" src="img/portfolio/submarine.png" alt="">
+                <!-- Portfolio Modal - Text -->
+                <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                <button class="btn btn-primary" href="#" data-dismiss="modal">
+                  <i class="fas fa-times fa-fw"></i>
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Plugin JavaScript -->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Contact Form JavaScript -->
+  <script src="js/jqBootstrapValidation.js"></script>
+  <script src="js/contact_me.js"></script>
+
+  <!-- Custom scripts for this template -->
+  <script src="js/freelancer.min.js"></script>
+
+</body>
+
+</html>

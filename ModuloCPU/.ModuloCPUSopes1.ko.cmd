@@ -1,0 +1,1 @@
+cmd_/home/sopes2/Downloads/ModuloCPU/ModuloCPUSopes1.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000 -T ./scripts/module-common.lds  --build-id  -o /home/sopes2/Downloads/ModuloCPU/ModuloCPUSopes1.ko /home/sopes2/Downloads/ModuloCPU/ModuloCPUSopes1.o /home/sopes2/Downloads/ModuloCPU/ModuloCPUSopes1.mod.o ;  true
